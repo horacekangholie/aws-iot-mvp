@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IoT Sensor MVP Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">AWS IoT / API Gateway / Cognito / Terraform</p>
+        <h1>IoT Sensor MVP Dashboard</h1>
+        <p class="subtitle">Login with Cognito, then read the latest simulated device telemetry from a protected API.</p>
+      </div>
+      <div class="actions">
+        <button id="loginBtn">Login</button>
+        <button id="logoutBtn" class="secondary">Logout</button>
+      </div>
+    </header>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Session</h2>
+        <p id="sessionStatus">Checking session...</p>
+        <p class="muted" id="userInfo">No signed-in user.</p>
+      </article>
+
+      <article class="card">
+        <h2>Device Query</h2>
+        <label for="deviceIdInput">Device ID</label>
+        <input id="deviceIdInput" type="text" />
+        <button id="refreshBtn">Load Latest Telemetry</button>
+      </article>
+    </section>
+
+    <section class="card telemetry-card">
+      <div class="card-header">
+        <h2>Latest Telemetry</h2>
+        <span id="lastUpdated" class="muted">Waiting for data...</span>
+      </div>
+      <div id="telemetryGrid" class="telemetry-grid hidden">
+        <div>
+          <span class="label">Temperature</span>
+          <strong id="temperatureValue">-</strong>
+        </div>
+        <div>
+          <span class="label">Humidity</span>
+          <strong id="humidityValue">-</strong>
+        </div>
+        <div>
+          <span class="label">Battery</span>
+          <strong id="batteryValue">-</strong>
+        </div>
+        <div>
+          <span class="label">Status</span>
+          <strong id="statusValue">-</strong>
+        </div>
+      </div>
+      <pre id="rawJson" class="raw-json">No data loaded yet.</pre>
+    </section>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

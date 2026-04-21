@@ -91,25 +91,60 @@
 
 ## 3. Architecture Diagram
 
-```mermaid
-flowchart LR
-    U[User Browser] --> CF[CloudFront]
-    CF --> S3[S3 Static Web App]
-    U --> COG[Cognito Hosted UI]
-    U -->|JWT| APIGW[API Gateway HTTP API]
-    APIGW --> LAPI[Lambda API]
-    LAPI --> DDB[(DynamoDB)]
+1. IoT Data Ingestion（裝置進來）
+![Alt Text](/images/1_IoT_Data_Ingestion.jpg)
 
-    SIM[IoT Simulator] -->|MQTT over WebSocket| IOT[AWS IoT Core]
-    IOT --> RULE[IoT Topic Rule]
-    RULE --> LINGEST[Lambda Ingest]
-    LINGEST --> DDB
++ IoT Device（或 simulator）
++ 使用 MQTT over WebSocket
++ 發送 telemetry → AWS IoT Core
 
-    subgraph AWS VPC
-      PUB1[Public Subnet A]
-      PUB2[Public Subnet B]
-    end
-```
+IoT Core = device gateway，負責接設備，不負責業務邏輯
+
+2. Stream Processing（資料進系統）
+![Alt Text](/images/2_Stream_Processing.jpg)
+
++ IoT Rule 被 trigger
++ 呼叫 Lambda（ingestion function）
++ Lambda 處理後寫入 DynamoDB
+
+IoT Rule = event router，Lambda = compute，DynamoDB = storage
+
+3. Backend API Layer（給前端用）
+![Alt Text](/images/3_Backend_API_Layer.jpg)
+
++ 使用 API Gateway
++ 背後接 Lambda（query data）
++ 從 DynamoDB 讀資料
+
+API Gateway = 統一入口 + auth control
+
+4. Authentication
+![Alt Text](/images/4_Authentication.jpg)
+
++ 使用 Cognito
++ Web App login（OAuth2 / JWT）
++ API Gateway 用 JWT Authorizer 驗證
+
+Cognito = OAuth2 provider，API Gateway = resource server
+
+5. Frontend Layer
+![Alt Text](/images/5_Frontend_Layer.jpg)
+
++ CloudFront + S3（Production）
+
+
+End-to-End Flow
+
++ Device publish → IoT Core (MQTT)
++ IoT Rule → Lambda ingest
++ Lambda → DynamoDB
++ User login → Cognito (OAuth2)
++ User call API → API Gateway (JWT)
++ API Gateway → Lambda → DynamoDB
++ Return data → Web App
+
+「Device 走 MQTT，User 走 HTTPS，中間用 Lambda + DynamoDB 接起來」
+
 
 ---
 
